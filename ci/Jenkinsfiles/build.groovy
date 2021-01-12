@@ -20,7 +20,7 @@
  *     Anahide Tchertchian <atchertchian@nuxeo.com>
  */
 properties([
-  [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/nuxeo/nuxeo-sample-multi-projects'],
+  [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/nuxeo/nuxeo-sample-multi-common'],
   [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', daysToKeepStr: '60', numToKeepStr: '60', artifactNumToKeepStr: '5']],
   disableConcurrentBuilds(),
 ])
@@ -28,7 +28,7 @@ properties([
 void setGitHubBuildStatus(String context, String message, String state) {
   step([
     $class: 'GitHubCommitStatusSetter',
-    reposSource: [$class: 'ManuallyEnteredRepositorySource', url: 'https://github.com/nuxeo/nuxeo-sample-multi-projects'],
+    reposSource: [$class: 'ManuallyEnteredRepositorySource', url: 'https://github.com/nuxeo/nuxeo-sample-multi-common'],
     contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: context],
     statusResultSource: [$class: 'ConditionalStatusResultSource', results: [[$class: 'AnyBuildResult', message: message, state: state]]],
   ])
