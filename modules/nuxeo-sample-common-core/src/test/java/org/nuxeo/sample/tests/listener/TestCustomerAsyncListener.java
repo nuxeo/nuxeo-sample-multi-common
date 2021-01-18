@@ -1,4 +1,4 @@
-package org.nuxeo.sample.listener;
+package org.nuxeo.sample.tests.listener;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -20,16 +20,16 @@ import javax.inject.Inject;
 @RunWith(FeaturesRunner.class)
 @Features({ PlatformFeature.class })
 @Deploy({"org.nuxeo.sample.operation.nuxeo-customer-project-sample-core"})
-public class TestCustomerListener {
+public class TestCustomerAsyncListener {
 
-    protected final List<String> events = Arrays.asList("aboutToCreate");
+    protected final List<String> events = Arrays.asList("documentCreated");
 
     @Inject
     protected EventService s;
 
     @Test
     public void listenerRegistration() {
-        EventListenerDescriptor listener = s.getEventListener("customerlistener");
+        EventListenerDescriptor listener = s.getEventListener("customerasynclistener");
         assertNotNull(listener);
         assertTrue(events.stream().allMatch(listener::acceptEvent));
     }

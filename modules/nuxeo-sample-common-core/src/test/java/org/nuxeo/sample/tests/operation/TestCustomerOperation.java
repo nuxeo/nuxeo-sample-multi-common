@@ -1,4 +1,4 @@
-package org.nuxeo.sample.operation;
+package org.nuxeo.sample.tests.operation;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,6 +21,7 @@ import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
+import org.nuxeo.sample.operation.CustomerOperation;
 
 @RunWith(FeaturesRunner.class)
 @Features(AutomationFeature.class)
