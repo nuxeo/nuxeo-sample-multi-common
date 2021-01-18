@@ -1,15 +1,11 @@
-import java.util.List;
+package org.nuxeo.sample.hpa.tests;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nuxeo.ecm.core.api.DocumentLocation;
 import org.nuxeo.ecm.core.test.CoreFeature;
-import org.nuxeo.ecm.core.work.AbstractWork;
 import org.nuxeo.ecm.core.work.SleepWork;
-import org.nuxeo.ecm.core.work.api.Work;
 import org.nuxeo.ecm.core.work.api.WorkManager;
-import org.nuxeo.ecm.core.work.api.WorkSchedulePath;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.stream.RuntimeStreamFeature;
 import org.nuxeo.runtime.test.runner.Deploy;

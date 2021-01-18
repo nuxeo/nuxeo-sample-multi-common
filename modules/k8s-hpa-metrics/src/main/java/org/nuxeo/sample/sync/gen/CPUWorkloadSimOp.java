@@ -1,20 +1,13 @@
-package org.nuxeo.sync.gen;
+package org.nuxeo.sample.sync.gen;
 
 import java.security.MessageDigest;
 import java.util.UUID;
 
 import org.nuxeo.ecm.automation.core.Constants;
-import org.nuxeo.ecm.automation.core.annotations.Context;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
 import org.nuxeo.ecm.automation.core.annotations.Param;
-import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.work.SleepWork;
-import org.nuxeo.ecm.core.work.api.WorkManager;
 
-/**
- *
- */
 @Operation(id = CPUWorkloadSimOp.ID, category = Constants.CAT_DOCUMENT, label = "CPUWorkloadSimOp", description = "Describe here what your operation does.")
 public class CPUWorkloadSimOp {
 

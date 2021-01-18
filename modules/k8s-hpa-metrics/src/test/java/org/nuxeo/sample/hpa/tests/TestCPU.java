@@ -1,5 +1,6 @@
+package org.nuxeo.sample.hpa.tests;
 import org.junit.Test;
-import org.nuxeo.sync.gen.CPUWorkloadSimOp;
+import org.nuxeo.sample.sync.gen.CPUWorkloadSimOp;
 
 public class TestCPU {
 
