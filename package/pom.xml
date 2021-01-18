@@ -30,6 +30,18 @@
       <groupId>nuxeo-studio</groupId>
       <artifactId>nuxeo-common-test-projec</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.nuxeo.sample</groupId>
+      <artifactId>plugin-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.sample</groupId>
+      <artifactId>k8s-hpa-metrics</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.sample</groupId>
+      <artifactId>nuxeo-extended-session</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
