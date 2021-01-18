@@ -14,7 +14,10 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>k8s-hpa-metrics</module>
+    <module>nuxeo-extended-session</module>
     <module>nuxeo-sample-common-core</module>
+    <module>plugin-core</module>
   </modules>
 
 </project>
