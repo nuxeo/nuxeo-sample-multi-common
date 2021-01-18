@@ -19,8 +19,11 @@
 package org.nuxeo.sample.sync.gen;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Operation;
 import org.nuxeo.ecm.automation.core.annotations.OperationMethod;
@@ -28,6 +31,8 @@ import org.nuxeo.ecm.automation.core.annotations.Param;
 
 @Operation(id = CPUWorkloadSimOp.ID, category = Constants.CAT_DOCUMENT, label = "CPUWorkloadSimOp", description = "Describe here what your operation does.")
 public class CPUWorkloadSimOp {
+
+    private static final Logger log = LogManager.getLogger(CPUWorkloadSimOp.class);
 
     public static final String ID = "CPUWorkload.Simulate";
 
@@ -39,7 +44,7 @@ public class CPUWorkloadSimOp {
         try {
             doSomething(durationS);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
     }
 
@@ -53,10 +58,9 @@ public class CPUWorkloadSimOp {
         return loops;
     }
 
-    public static void doSomething() throws Exception {
-
+    public static void doSomething() throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 1000; i++) {
             sb.append(UUID.randomUUID().toString());
             digest.update(sb.toString().getBytes());

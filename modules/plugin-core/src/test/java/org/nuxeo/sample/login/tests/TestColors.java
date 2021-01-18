@@ -17,18 +17,24 @@
  *     Thierry Delprat
  */
 package org.nuxeo.sample.login.tests;
+
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.nuxeo.sample.login.LoginTenantHelper;
 
 public class TestColors {
 
+    protected static final String DEFAULT_COLOR = "#FCF4A8";
+
     @Test
     public void testColors() {
-
-        LoginTenantHelper lth = new LoginTenantHelper();
-
-        System.out.println(lth.getColor4Tenant("tenant1"));
-        System.out.println(lth.getColor4Tenant("tenant2"));
-        System.out.println(lth.getColor4Tenant("tenant3"));
+        assertEquals(DEFAULT_COLOR, LoginTenantHelper.getColor4Tenant(null));
+        assertEquals(DEFAULT_COLOR, LoginTenantHelper.getColor4Tenant(""));
+        assertEquals(DEFAULT_COLOR, LoginTenantHelper.getColor4Tenant(" "));
+        assertEquals("#61A695", LoginTenantHelper.getColor4Tenant("tenant1"));
+        assertEquals("#FEF95B", LoginTenantHelper.getColor4Tenant("tenant2"));
+        assertEquals("#810403", LoginTenantHelper.getColor4Tenant("tenant3"));
     }
+
 }

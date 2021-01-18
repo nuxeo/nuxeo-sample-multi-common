@@ -22,6 +22,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.dropwizard.metrics5.Counter;
 import io.dropwizard.metrics5.Gauge;
 import io.dropwizard.metrics5.Histogram;
@@ -34,6 +37,8 @@ import io.dropwizard.metrics5.SlidingTimeWindowArrayReservoir;
 import io.dropwizard.metrics5.Timer;
 
 public class LoadReporter extends ScheduledReporter {
+
+    private static final Logger log = LogManager.getLogger(LoadReporter.class);
 
     public static class LoadGauge implements Gauge<Number> {
 
@@ -82,10 +87,6 @@ public class LoadReporter extends ScheduledReporter {
             SortedMap<MetricName, Histogram> histograms, SortedMap<MetricName, Meter> meters,
             SortedMap<MetricName, Timer> timers) {
 
-        int done = 0;
-        int scheduled = 0;
-        int running = 0;
-
         long lag = 0;
         long latency = 0;
 
@@ -113,7 +114,7 @@ public class LoadReporter extends ScheduledReporter {
         // double wload = computeWorkersLoad(done, scheduled, running);
         double sload = computeStreamLoad(lag, latency);
 
-        System.out.println(" Computed load " + sload);
+        log.info(" Computed load {}", sload);
 
         gauge.load = sload;
 
@@ -121,7 +122,7 @@ public class LoadReporter extends ScheduledReporter {
 
     protected double computeStreamLoad(long lag, long latency) {
 
-        System.out.printf("\n lag: %s latency: %s ", lag, latency);
+        log.info("\n lag: {} latency: {}", lag, latency);
         return Double.max(lag / 20.0, latency / (1000 * 5 * 60.0));
     }
 
@@ -137,7 +138,7 @@ public class LoadReporter extends ScheduledReporter {
             throughput.update(deltaDone);
         }
 
-        System.out.printf("\n done: %s sheduled: %s running: %s -- ", newDone, newScheduled, newRunning);
+        log.info("\n done: {} sheduled: {} running: {} -- ", newDone, newScheduled, newRunning);
         if (newRunning == 0) {
             return 0;
         }
@@ -152,7 +153,7 @@ public class LoadReporter extends ScheduledReporter {
         if (meanThroughputPerMinute > 0) {
             load = (ratio * newScheduled) / (meanThroughputPerMinute);
         }
-        System.out.println("Load = " + load);
+        log.info("Load = {}", load);
         return load;
     }
 

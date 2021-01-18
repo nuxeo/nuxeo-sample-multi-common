@@ -18,7 +18,6 @@
  */
 package org.nuxeo.sample.runtime.load.reporter;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -41,11 +40,6 @@ public class StreamMetricsAggregator extends AbstractMetricsReporter {
     };
 
     protected LoadReporter reporter;
-
-    @Override
-    public void init(long pollInterval, Map<String, String> options) {
-        super.init(pollInterval, options);
-    }
 
     @Override
     public void start(MetricRegistry registry, MetricFilter filter, Set<MetricAttribute> deniedExpansions) {
