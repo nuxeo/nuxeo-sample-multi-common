@@ -1,5 +1,6 @@
+package org.nuxeo.sample.login.tests;
 import org.junit.Test;
-import org.nuxeo.login.LoginTenantHelper;
+import org.nuxeo.sample.login.LoginTenantHelper;
 
 public class TestColors {
 

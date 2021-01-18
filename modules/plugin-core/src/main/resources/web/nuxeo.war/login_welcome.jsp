@@ -14,7 +14,7 @@
 <%@ page import="org.nuxeo.ecm.platform.web.common.admin.AdminStatusHelper"%>
 <%@ page import="org.nuxeo.common.Environment"%>
 <%@ page import="org.nuxeo.runtime.api.Framework"%>
-<%@ page import="org.nuxeo.login.LoginTenantHelper"%>
+<%@ page import="org.nuxeo.sample.login.LoginTenantHelper"%>
 <%@ page import="org.nuxeo.ecm.platform.ui.web.auth.service.LoginVideo" %>
 <%@ page import="org.nuxeo.ecm.platform.web.common.locale.LocaleProvider"%>
 
