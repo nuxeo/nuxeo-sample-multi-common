@@ -1,4 +1,4 @@
-package org.nuxeo.login;
+package org.nuxeo.sample.login;
 
 import java.security.MessageDigest;
 
