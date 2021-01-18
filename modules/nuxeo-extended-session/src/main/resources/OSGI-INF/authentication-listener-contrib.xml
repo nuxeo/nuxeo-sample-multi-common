@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.auth.extended.session.listener.contrib">
+
+  <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+    <listener name="extendedSessionListener" async="false" postCommit="false" priority="10"
+              class="org.nuxeo.auth.extended.session.ExtendedSessionListener">
+      <event>loginSuccess</event>
+      <event>logout</event>
+    </listener>
+  </extension>
+
+</component>

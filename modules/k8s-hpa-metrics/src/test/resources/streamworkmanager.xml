@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.ecm.core.work.test.stream" version="1.0">
+
+  <require>org.nuxeo.ecm.core.work.service</require>
+
+  <service>
+    <provide interface="org.nuxeo.ecm.core.work.api.WorkManager" />
+  </service>
+
+  <implementation class="org.nuxeo.ecm.core.work.StreamWorkManager" />
+
+  <extension-point name="queues">
+    <object class="org.nuxeo.ecm.core.work.api.WorkQueueDescriptor" />
+  </extension-point>
+
+  <!--  this enables the state storage in StreamWorkManager so tests are run in the most complete way -->
+  <extension target="org.nuxeo.runtime.ConfigurationService" point="configuration">
+    <property name="nuxeo.stream.work.storestate.enabled">true</property>
+  </extension>
+
+</component>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<component name="org.nuxeo.auth.extended.session.cache.config">
+
+  <extension target="org.nuxeo.runtime.kv.KeyValueService" point="configuration">
+    <store name="extendedSession-cache" class="org.nuxeo.runtime.kv.MemKeyValueStore">
+    </store>
+  </extension>
+
+</component>

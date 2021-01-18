@@ -1,0 +1,9 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: org.nuxeo.test
+Bundle-Version: 1.0.0
+Bundle-Name: plugin-core
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.nuxeo.test.plugin-core;singleton=true
+Nuxeo-Component: OSGI-INF/login-screen-custo.xml

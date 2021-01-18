@@ -1,0 +1,11 @@
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Manifest-Version: 1.0
+Bundle-Vendor: org.nuxeo
+Bundle-Version: 1.0.0
+Bundle-Name: nuxeo-k8s-metrics
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.nuxeo.k8s.metrics;singleton=true
+Nuxeo-Component: OSGI-INF/metrics-config.xml,
+ OSGI-INF/metrics-config2.xml,
+ OSGI-INF/operation-contrib.xml
