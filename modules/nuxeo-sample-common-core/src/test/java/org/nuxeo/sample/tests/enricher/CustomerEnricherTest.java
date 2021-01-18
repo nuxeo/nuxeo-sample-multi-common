@@ -1,24 +1,25 @@
-package org.nuxeo.sample.enricher;
+package org.nuxeo.sample.tests.enricher;
 
 import javax.inject.Inject;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.ecm.core.api.CoreSession;
-import org.nuxeo.ecm.core.api.PathRef;
-import org.nuxeo.ecm.platform.test.PlatformFeature;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.io.marshallers.json.document.DocumentModelJsonWriter;
+import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.io.marshallers.json.AbstractJsonWriterTest;
 import org.nuxeo.ecm.core.io.marshallers.json.JsonAssert;
+import org.nuxeo.ecm.core.io.marshallers.json.document.DocumentModelJsonWriter;
 import org.nuxeo.ecm.core.io.registry.context.RenderingContext.CtxBuilder;
+import org.nuxeo.ecm.platform.test.PlatformFeature;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
+import org.nuxeo.sample.enricher.CustomerEnricher;
 
 @RunWith(FeaturesRunner.class)
-@Features({PlatformFeature.class})
-@Deploy({"org.nuxeo.sample.operation.nuxeo-customer-project-sample-core"})
+@Features({ PlatformFeature.class })
+@Deploy({ "org.nuxeo.sample.operation.nuxeo-customer-project-sample-core" })
 public class CustomerEnricherTest extends AbstractJsonWriterTest.Local<DocumentModelJsonWriter, DocumentModel> {
 
     public CustomerEnricherTest() {
