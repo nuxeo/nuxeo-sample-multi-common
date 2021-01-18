@@ -26,38 +26,38 @@ import org.nuxeo.runtime.kv.KeyValueStore;
  */
 public class ExtendedSessionListener implements EventListener {
 
-	private static final Log log = LogFactory.getLog(ExtendedSessionListener.class);
+    private static final Log log = LogFactory.getLog(ExtendedSessionListener.class);
 
-	@Override
-	public void handleEvent(Event event) {
-		try {
-			if (event.getName().equals("loginSuccess")) {
-				createOrExtendAuthSession(event.getContext().getPrincipal());
-			} else if (event.getName().equals("logout")) {
-				clearAuthSession();
-			}
-		} catch (Exception e) {
-			log.error("Error while processing event " + event.getName(), e);
-		}
-	}
+    @Override
+    public void handleEvent(Event event) {
+        try {
+            if (event.getName().equals("loginSuccess")) {
+                createOrExtendAuthSession(event.getContext().getPrincipal());
+            } else if (event.getName().equals("logout")) {
+                clearAuthSession();
+            }
+        } catch (Exception e) {
+            log.error("Error while processing event " + event.getName(), e);
+        }
+    }
 
-	protected void createOrExtendAuthSession(Principal principal) {
-		KeyValueService keyValueService = Framework.getService(KeyValueService.class);
-		KeyValueStore sessionCache = keyValueService.getKeyValueStore(SessionConstants.EX_SESSION_CACHE_NAME);
-		String key = SessionIdFilter.getSessionId();
-		String principalName = sessionCache.getString(key);
-		if (principalName == null) {
-			long ttl = Long.parseLong(Framework.getProperty(SessionConstants.EX_SESSION_CACHE_TTL,
-					SessionConstants.EX_SESSION_CACHE_DEFAULT_TTL));
-			sessionCache.put(key, principal.getName(), ttl);
-		}
-	}
+    protected void createOrExtendAuthSession(Principal principal) {
+        KeyValueService keyValueService = Framework.getService(KeyValueService.class);
+        KeyValueStore sessionCache = keyValueService.getKeyValueStore(SessionConstants.EX_SESSION_CACHE_NAME);
+        String key = SessionIdFilter.getSessionId();
+        String principalName = sessionCache.getString(key);
+        if (principalName == null) {
+            long ttl = Long.parseLong(Framework.getProperty(SessionConstants.EX_SESSION_CACHE_TTL,
+                    SessionConstants.EX_SESSION_CACHE_DEFAULT_TTL));
+            sessionCache.put(key, principal.getName(), ttl);
+        }
+    }
 
-	protected void clearAuthSession() {
-		KeyValueStore sessionCache = Framework.getService(KeyValueService.class)
-				.getKeyValueStore(SessionConstants.EX_SESSION_CACHE_NAME);
-		String key = SessionIdFilter.getSessionId();
-		sessionCache.put(key, (byte[]) null);
-	}
+    protected void clearAuthSession() {
+        KeyValueStore sessionCache = Framework.getService(KeyValueService.class)
+                                              .getKeyValueStore(SessionConstants.EX_SESSION_CACHE_NAME);
+        String key = SessionIdFilter.getSessionId();
+        sessionCache.put(key, (byte[]) null);
+    }
 
 }

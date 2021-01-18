@@ -38,7 +38,7 @@ public class ExtendedSessionAuth implements NuxeoAuthenticationPlugin {
 
     private long ttl;
 
-	private static final Log log = LogFactory.getLog(ExtendedSessionAuth.class);
+    private static final Log log = LogFactory.getLog(ExtendedSessionAuth.class);
 
     @Override
     public List<String> getUnAuthenticatedURLPrefix() {
@@ -47,7 +47,7 @@ public class ExtendedSessionAuth implements NuxeoAuthenticationPlugin {
 
     @Override
     public Boolean handleLoginPrompt(HttpServletRequest request, HttpServletResponse response, String baseURL) {
-    	return false;
+        return false;
     }
 
     @Override
@@ -62,19 +62,19 @@ public class ExtendedSessionAuth implements NuxeoAuthenticationPlugin {
         KeyValueStore sessionCache = keyValueService.getKeyValueStore(EX_SESSION_CACHE_NAME);
         String principalName = sessionCache.getString(sid);
         if (principalName != null) {
-            log.debug("ExtendedSessionAuth retrived user session from KV" );
+            log.debug("ExtendedSessionAuth retrived user session from KV");
             // refresh ttl
             sessionCache.put(sid, principalName, ttl);
             return new UserIdentificationInfo(principalName, principalName);
-        } 
-        log.debug("ExtendedSessionAuth no session found in KV!" );
+        }
+        log.debug("ExtendedSessionAuth no session found in KV!");
         return null;
     }
 
     @Override
     public void initPlugin(Map<String, String> parameters) {
         log.debug("ExtendedSessionAuth Plugin initializing");
-    	ttl = Long.parseLong(Framework.getProperty(EX_SESSION_CACHE_TTL, EX_SESSION_CACHE_DEFAULT_TTL));
+        ttl = Long.parseLong(Framework.getProperty(EX_SESSION_CACHE_TTL, EX_SESSION_CACHE_DEFAULT_TTL));
     }
 
     @Override

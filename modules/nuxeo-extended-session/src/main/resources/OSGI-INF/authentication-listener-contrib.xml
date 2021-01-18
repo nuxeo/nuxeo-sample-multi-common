@@ -3,7 +3,7 @@
 
   <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
     <listener name="extendedSessionListener" async="false" postCommit="false" priority="10"
-              class="org.nuxeo.auth.extended.session.ExtendedSessionListener">
+      class="org.nuxeo.auth.extended.session.ExtendedSessionListener">
       <event>loginSuccess</event>
       <event>logout</event>
     </listener>

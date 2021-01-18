@@ -38,119 +38,116 @@ import org.nuxeo.runtime.test.runner.ServletContainer;
 @ServletContainer(port = 18090)
 public class AuthenticationWithCacheInMemoryTest {
 
-	private static final String BASE_URL = "http://localhost:18090";
+    private static final String BASE_URL = "http://localhost:18090";
 
-	private static final String LOGIN = "Administrator";
+    private static final String LOGIN = "Administrator";
 
-	private static final String PASSWORD = "Administrator";
+    private static final String PASSWORD = "Administrator";
 
-	private static final String HEADER_COOKIE_ID = "Set-Cookie";
+    private static final String HEADER_COOKIE_ID = "Set-Cookie";
 
-	protected boolean hasCookie(CloseableHttpResponse response, String cookieName) {
-		Header[] headers = response.getHeaders(HEADER_COOKIE_ID);
-		for (Header header : headers) {
-			if (header.getValue().contains(cookieName)) {
-				System.out.println(header.getValue());
-				return true;
-			}
-		}
-		return false;
-	}
+    protected boolean hasCookie(CloseableHttpResponse response, String cookieName) {
+        Header[] headers = response.getHeaders(HEADER_COOKIE_ID);
+        for (Header header : headers) {
+            if (header.getValue().contains(cookieName)) {
+                System.out.println(header.getValue());
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Test
-	public void testClientWithNoExtendedSession() throws Exception {
+    @Test
+    public void testClientWithNoExtendedSession() throws Exception {
 
-		// when secure cookie is on, since we are using http in this test
-		// the extended session is technically disabled
-		SessionIdFilter.useSecureCookie=true;
-		
-		CloseableHttpClient httpclient = HttpClients.createDefault();
+        // when secure cookie is on, since we are using http in this test
+        // the extended session is technically disabled
+        SessionIdFilter.useSecureCookie = true;
 
-		String content = doLogin(httpclient);
-		System.out.println(content);
-		
-		content = checkAuthenticated(httpclient);
-		System.out.println(content);
-		
-		killSession(httpclient);
-		
-		checkNotAuthenticated(httpclient);
+        CloseableHttpClient httpclient = HttpClients.createDefault();
 
-	}
+        String content = doLogin(httpclient);
+        System.out.println(content);
 
-	@Test
-	public void testClientWithExtendedSession() throws Exception {
+        content = checkAuthenticated(httpclient);
+        System.out.println(content);
 
-		// when secure cookie is on, since we are using http in this test
-		// the extended session is technically disabled
-		SessionIdFilter.useSecureCookie=false;
-		
-		CloseableHttpClient httpclient = HttpClients.createDefault();
+        killSession(httpclient);
 
-		String content = doLogin(httpclient);
-		System.out.println(content);
-		
-		content = checkAuthenticated(httpclient);
-		System.out.println(content);
-		
-		killSession(httpclient);
-		
-		content = checkAuthenticated(httpclient);
-		System.out.println(content);
-		
-		
-	}
+        checkNotAuthenticated(httpclient);
 
+    }
 
-	protected void killSession(CloseableHttpClient httpclient) throws Exception {
-		HttpGet httpGet = new HttpGet(BASE_URL + "/killSession");
-		CloseableHttpResponse response = httpclient.execute(httpGet);
-		return;
-	}
-	
-	protected String checkAuthenticated(CloseableHttpClient httpclient) throws Exception {
-		HttpGet httpGet = new HttpGet(BASE_URL + "/sayHello");
+    @Test
+    public void testClientWithExtendedSession() throws Exception {
 
-		CloseableHttpResponse response = httpclient.execute(httpGet);
-		String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
-		assertTrue(content.contains("Administrator"));
-		
-		return content;
-	}
-	
-	protected String checkNotAuthenticated(CloseableHttpClient httpclient) throws Exception {
-		HttpGet httpGet = new HttpGet(BASE_URL + "/sayHello");
+        // when secure cookie is on, since we are using http in this test
+        // the extended session is technically disabled
+        SessionIdFilter.useSecureCookie = false;
 
-		CloseableHttpResponse response = httpclient.execute(httpGet);
-		String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
-		
-		System.out.println(content);
-		assertFalse(content.contains("Administrator"));
-		
-		return content;
+        CloseableHttpClient httpclient = HttpClients.createDefault();
 
-	}
+        String content = doLogin(httpclient);
+        System.out.println(content);
 
+        content = checkAuthenticated(httpclient);
+        System.out.println(content);
 
-	protected String doLogin(CloseableHttpClient httpclient) throws Exception {
+        killSession(httpclient);
 
-		List<NameValuePair> form = new ArrayList<>();
-		form.add(new BasicNameValuePair("user_name", "Administrator"));
-		form.add(new BasicNameValuePair("user_password", "Administrator"));
-		form.add(new BasicNameValuePair("form_submitted_marker", "yoohoo"));
+        content = checkAuthenticated(httpclient);
+        System.out.println(content);
 
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
-		HttpPost httpPost = new HttpPost(BASE_URL + "/login");
-		httpPost.setEntity(entity);
+    }
 
-		CloseableHttpResponse response = httpclient.execute(httpPost);
-		String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
-		assertTrue(content.contains("Administrator"));
+    protected void killSession(CloseableHttpClient httpclient) throws Exception {
+        HttpGet httpGet = new HttpGet(BASE_URL + "/killSession");
+        CloseableHttpResponse response = httpclient.execute(httpGet);
+        return;
+    }
 
-		assertTrue(hasCookie(response, "JSESSIONID"));
-		assertTrue(hasCookie(response, SessionConstants.EX_SESSION_COOKIE_NAME));
+    protected String checkAuthenticated(CloseableHttpClient httpclient) throws Exception {
+        HttpGet httpGet = new HttpGet(BASE_URL + "/sayHello");
 
-		return content;
-	}
+        CloseableHttpResponse response = httpclient.execute(httpGet);
+        String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
+        assertTrue(content.contains("Administrator"));
+
+        return content;
+    }
+
+    protected String checkNotAuthenticated(CloseableHttpClient httpclient) throws Exception {
+        HttpGet httpGet = new HttpGet(BASE_URL + "/sayHello");
+
+        CloseableHttpResponse response = httpclient.execute(httpGet);
+        String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
+
+        System.out.println(content);
+        assertFalse(content.contains("Administrator"));
+
+        return content;
+
+    }
+
+    protected String doLogin(CloseableHttpClient httpclient) throws Exception {
+
+        List<NameValuePair> form = new ArrayList<>();
+        form.add(new BasicNameValuePair("user_name", "Administrator"));
+        form.add(new BasicNameValuePair("user_password", "Administrator"));
+        form.add(new BasicNameValuePair("form_submitted_marker", "yoohoo"));
+
+        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
+        HttpPost httpPost = new HttpPost(BASE_URL + "/login");
+        httpPost.setEntity(entity);
+
+        CloseableHttpResponse response = httpclient.execute(httpPost);
+        String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
+        assertTrue(content.contains("Administrator"));
+
+        assertTrue(hasCookie(response, "JSESSIONID"));
+        assertTrue(hasCookie(response, SessionConstants.EX_SESSION_COOKIE_NAME));
+
+        return content;
+    }
 
 }
