@@ -45,7 +45,7 @@ void getNuxeoVersion(version) {
 }
 
 void getMavenReleaseOptions(Boolean skipTests) {
-  def options = ''
+  def options = ' '
   if (skipTests) {
     return options + ' -DskipTests'
   }
