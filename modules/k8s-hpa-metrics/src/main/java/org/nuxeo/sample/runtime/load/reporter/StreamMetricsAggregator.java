@@ -1,4 +1,4 @@
-package org.nuxeo.runtime.load.reporter;
+package org.nuxeo.sample.runtime.load.reporter;
 
 import java.util.Map;
 import java.util.Set;

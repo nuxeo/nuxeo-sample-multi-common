@@ -118,6 +118,7 @@ public class K8StackdriverReporter extends StackdriverReporter {
         Metrics.getExportComponent().getMetricProducerManager().add(registries);
         Duration timeout = Duration.create(
                 DurationUtils.parsePositive(options.get(TIMEOUT_OPTION), DEFAULT_TIMEOUT).getSeconds(), 0);
+        // FIXME: this method is protected (hence reuse of the original nuxeo package)
         String projectId = StackdriverTraceReporter.getGcpProjectId(options);
 
         String prefix = options.getOrDefault(PREFIX_OPTION, DEFAULT_PREFIX);

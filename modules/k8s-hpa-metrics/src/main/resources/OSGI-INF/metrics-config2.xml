@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.runtime.metrics.MetricsService" point="reporter">
 
     <reporter enabled="true" name="workerload" pollInterval="10"
-      class="org.nuxeo.runtime.load.reporter.StreamMetricsAggregator">
+      class="org.nuxeo.sample.runtime.load.reporter.StreamMetricsAggregator">
     </reporter>
 
   </extension>

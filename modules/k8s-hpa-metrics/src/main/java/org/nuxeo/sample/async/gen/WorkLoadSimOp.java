@@ -1,4 +1,4 @@
-package org.nuxeo.async.gen;
+package org.nuxeo.sample.async.gen;
 
 import org.nuxeo.ecm.automation.core.Constants;
 import org.nuxeo.ecm.automation.core.annotations.Context;
