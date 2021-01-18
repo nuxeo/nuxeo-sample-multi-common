@@ -45,7 +45,7 @@ void getNuxeoVersion(version) {
 }
 
 void getMavenReleaseOptions(Boolean skipTests) {
-  def options = '-DskipDocker'
+  def options = ''
   if (skipTests) {
     return options + ' -DskipTests'
   }
@@ -77,12 +77,10 @@ pipeline {
   environment {
     CURRENT_VERSION = getCurrentVersion()
     RELEASE_VERSION = getReleaseVersion(params.RELEASE_VERSION, CURRENT_VERSION)
-    NUXEO_IMAGE_VERSION = getNuxeoVersion(params.NUXEO_VERSION)
     MAVEN_ARGS = '-B -nsu -Prelease'
     MAVEN_RELEASE_OPTIONS = getMavenReleaseOptions(params.SKIP_TESTS)
     MAVEN_SKIP_ENFORCER = ' -Dnuxeo.skip.enforcer=true'
     CONNECT_PROD_URL = 'https://connect.nuxeo.com/nuxeo'
-    NUXEO_DOCKER_REGISTRY = 'docker-private.packages.nuxeo.com'
     VERSION = "${RELEASE_VERSION}"
     DRY_RUN = "${params.DRY_RUN}"
     BRANCH_NAME = "${params.BRANCH_NAME}"
@@ -101,7 +99,6 @@ pipeline {
           Release version:            '${RELEASE_VERSION}'
           Next version:               '${params.NEXT_VERSION}'
 
-          Nuxeo version:              '${NUXEO_IMAGE_VERSION}'
           Next Nuxeo version:         '${params.NEXT_NUXEO_VERSION}'
 
           Jira issue:                 '${params.JIRA_ISSUE}'
@@ -228,7 +225,7 @@ pipeline {
           ----------------------------------------
           Deploy Maven Artifacts
           ----------------------------------------"""
-          sh "mvn ${MAVEN_ARGS} ${MAVEN_SKIP_ENFORCER} -DskipTests -DskipDocker deploy"
+          sh "mvn ${MAVEN_ARGS} ${MAVEN_SKIP_ENFORCER} -DskipTests deploy"
         }
       }
     }
@@ -253,24 +250,6 @@ pipeline {
               done
             """
           }
-        }
-      }
-    }
-
-    stage('Promote Docker images') {
-      when {
-        not {
-          environment name: 'DRY_RUN', value: 'true'
-        }
-      }
-      steps {
-        container('maven') {
-          echo """
-          -----------------------------------------------
-          Tag Docker images with version ${RELEASE_VERSION}
-          -----------------------------------------------
-          """
-          dockerDeploy("${RELEASE_VERSION}")
         }
       }
     }
