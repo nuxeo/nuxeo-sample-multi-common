@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.runtime.metrics.k8s.contrib">
+
+ <require>org.nuxeo.runtime.metrics.default.contrib</require>
+  
+  <extension target="org.nuxeo.runtime.metrics.MetricsService" point="reporter">
+  
+    <reporter enabled="true" name="stackdriver" pollInterval="10"
+      class="org.nuxeo.runtime.metrics.reporter.K8StackdriverReporter">
+      <option name="gcpProjectId">jx-preprod</option>
+      <option name="cluster_name">multitenants</option>
+      <option name="cluster_location">us-central1-c</option>
+      <option name="timeout">30s</option>
+    </reporter>
+
+  </extension>
+
+</component>
