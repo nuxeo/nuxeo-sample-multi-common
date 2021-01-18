@@ -4,8 +4,7 @@
   <require>org.nuxeo.ecm.platform.ui.web.auth.WebEngineConfig</require>
   <require>org.nuxeo.ecm.platform.ui.web.auth.defaultConfig</require>
 
-  <extension target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService"
-   point="chain">
+  <extension target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService" point="chain">
     <authenticationChain>
       <plugins>
         <plugin>NUXEO_EXTENDED_SESSION</plugin>

@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
     <listener async="true" postCommit="true" name="customerasynclistener"
       class="org.nuxeo.sample.listener.CustomerAsyncListener">
-        <event>documentCreated</event>
+      <event>documentCreated</event>
     </listener>
   </extension>
 

@@ -22,7 +22,8 @@ import org.nuxeo.runtime.test.runner.RunnerFeature;
 @Features({ ServletContainerTransactionalFeature.class, PlatformFeature.class })
 @Deploy("org.nuxeo.ecm.platform.login")
 @Deploy("org.nuxeo.ecm.platform.web.common:OSGI-INF/authentication-framework.xml")
-@Deploy({ "nuxeo.extended.session", "nuxeo.extended.session:test-authentication-config.xml" ,  "nuxeo.extended.session:embedded-servletcontainer-config.xml" })
-public class HttpServerContainerWithAuthFeature  implements RunnerFeature {
+@Deploy({ "nuxeo.extended.session", "nuxeo.extended.session:test-authentication-config.xml",
+        "nuxeo.extended.session:embedded-servletcontainer-config.xml" })
+public class HttpServerContainerWithAuthFeature implements RunnerFeature {
 
 }

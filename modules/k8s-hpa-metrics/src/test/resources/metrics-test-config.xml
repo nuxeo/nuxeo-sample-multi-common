@@ -9,7 +9,7 @@
       <filter>
         <allow>
           <prefix>nuxeo.stream.</prefix>
-          <prefix>nuxeo.streams.</prefix>          
+          <prefix>nuxeo.streams.</prefix>
           <prefix>nuxeo.cache.default-cache.</prefix>
           <prefix>nuxeo.cache.user-entry-cache.</prefix>
           <prefix>nuxeo.cache.group-entry-cache.</prefix>
@@ -37,19 +37,20 @@
       </filter>
     </configuration>
   </extension>
-  
-   <extension point="streamProcessor" target="org.nuxeo.runtime.stream.service">
-    
-    <streamProcessor name="metrics" class="org.nuxeo.runtime.stream.StreamMetricsProcessor" enabled="true">
+
+  <extension point="streamProcessor" target="org.nuxeo.runtime.stream.service">
+
+    <streamProcessor name="metrics" class="org.nuxeo.runtime.stream.StreamMetricsProcessor"
+      enabled="true">
       <policy name="default" maxRetries="5" delay="1s" maxDelay="10s" continueOnFailure="false" />
       <stream name="input/null" partitions="1" codec="avro" />
       <computation name="stream/metrics" concurrency="1" />
     </streamProcessor>
-    
+
   </extension>
-    
-   <extension point="configuration" target="org.nuxeo.runtime.ConfigurationService">
-        <property name="nuxeo.stream.work.enabled">true</property>
-   </extension>
-  
+
+  <extension point="configuration" target="org.nuxeo.runtime.ConfigurationService">
+    <property name="nuxeo.stream.work.enabled">true</property>
+  </extension>
+
 </component>  

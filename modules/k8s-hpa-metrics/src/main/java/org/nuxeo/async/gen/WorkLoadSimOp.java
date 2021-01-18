@@ -12,7 +12,7 @@ import org.nuxeo.ecm.core.work.api.WorkManager;
 /**
  *
  */
-@Operation(id=WorkLoadSimOp.ID, category=Constants.CAT_DOCUMENT, label="WorkLoadSimOp", description="Describe here what your operation does.")
+@Operation(id = WorkLoadSimOp.ID, category = Constants.CAT_DOCUMENT, label = "WorkLoadSimOp", description = "Describe here what your operation does.")
 public class WorkLoadSimOp {
 
     public static final String ID = "Workload.Simulate";
@@ -27,14 +27,14 @@ public class WorkLoadSimOp {
     protected Integer nbWork;
 
     @Param(name = "duration", required = false)
-    protected Integer durationS=10;
+    protected Integer durationS = 10;
 
     @OperationMethod
     public void run() {
-    	
-    	for (int i = 0; i < nbWork; i++) {
-    		wm.schedule(new SleepWork(1000*durationS));
-    	}
-    
+
+        for (int i = 0; i < nbWork; i++) {
+            wm.schedule(new SleepWork(1000 * durationS));
+        }
+
     }
 }
