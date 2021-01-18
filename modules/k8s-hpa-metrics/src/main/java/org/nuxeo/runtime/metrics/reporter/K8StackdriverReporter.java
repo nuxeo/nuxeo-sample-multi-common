@@ -60,7 +60,7 @@ public class K8StackdriverReporter extends StackdriverReporter {
             value = options.get(attribute);
         }
         if (value == null) {
-            log.warn("Unable to find podInfo " + attribute);
+            log.warn("Unable to find podInfo {}", attribute);
         }
         return value;
     }
@@ -96,7 +96,7 @@ public class K8StackdriverReporter extends StackdriverReporter {
         }
 
         for (LabelKey key : labels.keySet()) {
-            log.debug(key.getKey() + " : '" + labels.get(key).getValue() + "'");
+            log.debug("{}: '{}'", key.getKey(), labels.get(key).getValue());
         }
 
         return labels;

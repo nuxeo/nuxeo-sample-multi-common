@@ -18,6 +18,7 @@
  */
 package org.nuxeo.auth.extended.session.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -32,9 +33,12 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.nuxeo.auth.extended.session.SessionConstants;
@@ -48,11 +52,15 @@ import org.nuxeo.runtime.test.runner.ServletContainer;
 @ServletContainer(port = 18090)
 public class AuthenticationWithCacheInMemoryTest {
 
+    private static final Logger log = LogManager.getLogger(AuthenticationWithCacheInMemoryTest.class);
+
     private static final String BASE_URL = "http://localhost:18090";
 
     private static final String LOGIN = "Administrator";
 
     private static final String PASSWORD = "Administrator";
+
+    private static final String HELLO_CONTENT = String.format(DummyServlet.HELLO_PATTERN, LOGIN);
 
     private static final String HEADER_COOKIE_ID = "Set-Cookie";
 
@@ -60,7 +68,7 @@ public class AuthenticationWithCacheInMemoryTest {
         Header[] headers = response.getHeaders(HEADER_COOKIE_ID);
         for (Header header : headers) {
             if (header.getValue().contains(cookieName)) {
-                System.out.println(header.getValue());
+                log.debug(header.getValue());
                 return true;
             }
         }
@@ -76,16 +84,12 @@ public class AuthenticationWithCacheInMemoryTest {
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
-        String content = doLogin(httpclient);
-        System.out.println(content);
-
-        content = checkAuthenticated(httpclient);
-        System.out.println(content);
+        doLogin(httpclient);
+        checkAuthenticated(httpclient);
 
         killSession(httpclient);
 
         checkNotAuthenticated(httpclient);
-
     }
 
     @Test
@@ -97,67 +101,51 @@ public class AuthenticationWithCacheInMemoryTest {
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
-        String content = doLogin(httpclient);
-        System.out.println(content);
-
-        content = checkAuthenticated(httpclient);
-        System.out.println(content);
+        doLogin(httpclient);
+        checkAuthenticated(httpclient);
 
         killSession(httpclient);
 
-        content = checkAuthenticated(httpclient);
-        System.out.println(content);
+        checkAuthenticated(httpclient);
+    }
 
+    protected String execute(CloseableHttpClient httpclient, HttpUriRequest request) throws Exception {
+        CloseableHttpResponse response = httpclient.execute(request);
+        return IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
     }
 
     protected void killSession(CloseableHttpClient httpclient) throws Exception {
-        HttpGet httpGet = new HttpGet(BASE_URL + "/killSession");
-        CloseableHttpResponse response = httpclient.execute(httpGet);
-        return;
+        HttpGet httpGet = new HttpGet(BASE_URL + DummyServlet.KILL_URI);
+        execute(httpclient, httpGet);
     }
 
-    protected String checkAuthenticated(CloseableHttpClient httpclient) throws Exception {
-        HttpGet httpGet = new HttpGet(BASE_URL + "/sayHello");
-
-        CloseableHttpResponse response = httpclient.execute(httpGet);
-        String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
-        assertTrue(content.contains("Administrator"));
-
-        return content;
+    protected void checkAuthenticated(CloseableHttpClient httpclient) throws Exception {
+        HttpGet httpGet = new HttpGet(BASE_URL + DummyServlet.HELLO_URI);
+        assertEquals(HELLO_CONTENT, execute(httpclient, httpGet));
     }
 
-    protected String checkNotAuthenticated(CloseableHttpClient httpclient) throws Exception {
-        HttpGet httpGet = new HttpGet(BASE_URL + "/sayHello");
-
-        CloseableHttpResponse response = httpclient.execute(httpGet);
-        String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
-
-        System.out.println(content);
-        assertFalse(content.contains("Administrator"));
-
-        return content;
-
+    protected void checkNotAuthenticated(CloseableHttpClient httpclient) throws Exception {
+        HttpGet httpGet = new HttpGet(BASE_URL + DummyServlet.HELLO_URI);
+        String content = execute(httpclient, httpGet);
+        assertFalse(content.contains(LOGIN));
     }
 
-    protected String doLogin(CloseableHttpClient httpclient) throws Exception {
-
+    protected void doLogin(CloseableHttpClient httpclient) throws Exception {
         List<NameValuePair> form = new ArrayList<>();
-        form.add(new BasicNameValuePair("user_name", "Administrator"));
-        form.add(new BasicNameValuePair("user_password", "Administrator"));
+        form.add(new BasicNameValuePair("user_name", LOGIN));
+        form.add(new BasicNameValuePair("user_password", PASSWORD));
         form.add(new BasicNameValuePair("form_submitted_marker", "yoohoo"));
 
         UrlEncodedFormEntity entity = new UrlEncodedFormEntity(form, Consts.UTF_8);
-        HttpPost httpPost = new HttpPost(BASE_URL + "/login");
+        HttpPost httpPost = new HttpPost(BASE_URL + DummyServlet.LOGIN_URI);
         httpPost.setEntity(entity);
 
         CloseableHttpResponse response = httpclient.execute(httpPost);
         String content = IOUtils.toString(response.getEntity().getContent(), Consts.UTF_8);
-        assertTrue(content.contains("Administrator"));
+        assertEquals(HELLO_CONTENT, content);
 
         assertTrue(hasCookie(response, "JSESSIONID"));
         assertTrue(hasCookie(response, SessionConstants.EX_SESSION_COOKIE_NAME));
-
-        return content;
     }
 
 }

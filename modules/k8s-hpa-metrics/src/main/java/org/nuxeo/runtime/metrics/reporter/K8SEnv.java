@@ -47,7 +47,7 @@ public class K8SEnv {
             }
             return FileUtils.readFileToString(file, Charset.defaultCharset());
         } catch (IOException e) {
-            log.error("Unable to read " + path, e);
+            log.error("Unable to read {}", path, e);
         }
         return null;
     }
@@ -59,7 +59,7 @@ public class K8SEnv {
             podInfo = getPodInfoFromFS(attribute);
         }
         if (podInfo == null) {
-            log.debug("Unable to find podInfo from env or FS" + attribute);
+            log.debug("Unable to find podInfo from env or FS: {}", attribute);
         }
         return podInfo;
     }

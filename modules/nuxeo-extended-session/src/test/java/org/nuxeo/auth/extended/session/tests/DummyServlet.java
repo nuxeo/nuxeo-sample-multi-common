@@ -28,14 +28,28 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.nuxeo.ecm.platform.ui.web.auth.NuxeoSecuredRequestWrapper;
 
 public class DummyServlet extends HttpServlet {
 
+    private static final Logger log = LogManager.getLogger(DummyServlet.class);
+
+    private static final long serialVersionUID = 1L;
+
+    public static final String LOGIN_URI = "/login";
+
+    public static final String HELLO_URI = "/sayHello";
+
+    public static final String HELLO_PATTERN = "Hello %s";
+
+    public static final String KILL_URI = "/killSession";
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        System.out.println("Starting the Dummy Servlet");
+        log.info("Starting the Dummy Servlet");
     }
 
     @Override
@@ -43,12 +57,12 @@ public class DummyServlet extends HttpServlet {
 
         String uri = req.getRequestURI();
 
-        if (uri.startsWith("/sayHello")) {
+        if (uri.startsWith(HELLO_URI)) {
             sayHello(req, resp);
-        } else if (uri.startsWith("/killSession")) {
+        } else if (uri.startsWith(KILL_URI)) {
             invalidateSession(req);
         } else {
-            System.out.println(" requested : " + uri);
+            log.info(" requested: {}", uri);
         }
 
         resp.setStatus(200);
@@ -59,11 +73,11 @@ public class DummyServlet extends HttpServlet {
 
         String uri = req.getRequestURI();
 
-        if (uri.startsWith("/login")) {
-            System.out.println("login!");
+        if (uri.startsWith(LOGIN_URI)) {
+            log.info("login");
             sayHello(req, resp);
         } else {
-            System.out.println("POST requested : " + uri);
+            log.info("POST requested: {}", uri);
         }
 
         resp.setStatus(200);
@@ -77,15 +91,14 @@ public class DummyServlet extends HttpServlet {
         }
     }
 
-    protected void sayHello(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void sayHello(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (req instanceof NuxeoSecuredRequestWrapper) {
             Principal principal = ((NuxeoSecuredRequestWrapper) req).getUserPrincipal();
-            resp.getWriter().append("Hello " + principal.getName());
-            resp.flushBuffer();
+            resp.getWriter().append(String.format(HELLO_PATTERN, principal.getName()));
         } else {
             resp.getWriter().append("No body");
-            resp.flushBuffer();
         }
+        resp.flushBuffer();
     }
 
 }

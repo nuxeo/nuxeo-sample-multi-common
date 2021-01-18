@@ -17,9 +17,12 @@
  *     Thierry Delprat
  */
 package org.nuxeo.sample.hpa.tests;
+
 import org.nuxeo.ecm.core.work.SleepWork;
 
 public class SleepyWork extends SleepWork {
+
+    private static final long serialVersionUID = 1L;
 
     public SleepyWork(long durationMillis) {
         super(durationMillis);

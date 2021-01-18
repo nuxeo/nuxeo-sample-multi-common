@@ -18,16 +18,11 @@
  */
 package org.nuxeo.auth.extended.session.tests;
 
-import org.nuxeo.ecm.core.test.CoreFeature;
 import org.nuxeo.ecm.core.test.ServletContainerTransactionalFeature;
 import org.nuxeo.ecm.platform.test.PlatformFeature;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.RunnerFeature;
-
-/**
- * @since 0.1
- */
 
 @Features({ ServletContainerTransactionalFeature.class, PlatformFeature.class })
 @Deploy("org.nuxeo.ecm.platform.login")

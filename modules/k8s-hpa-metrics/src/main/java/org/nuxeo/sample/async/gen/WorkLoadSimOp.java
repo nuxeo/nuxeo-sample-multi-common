@@ -27,9 +27,6 @@ import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.work.SleepWork;
 import org.nuxeo.ecm.core.work.api.WorkManager;
 
-/**
- *
- */
 @Operation(id = WorkLoadSimOp.ID, category = Constants.CAT_DOCUMENT, label = "WorkLoadSimOp", description = "Describe here what your operation does.")
 public class WorkLoadSimOp {
 
