@@ -44,6 +44,11 @@ void getNuxeoVersion(version) {
   return version
 }
 
+void replacePomProperty(name, value) {
+  // only replace the first occurrence
+  sh("perl -i -pe '!\$x && s|<${name}>.*?</${name}>|<${name}>${value}</${name}>| && (\$x=1)' pom.xml")
+}
+
 void getMavenReleaseOptions(Boolean skipTests) {
   def options = ' '
   if (skipTests) {
@@ -163,11 +168,7 @@ pipeline {
               """
             }
             if (!params.NUXEO_VERSION.isEmpty()) {
-              sh """
-                # nuxeo version
-                # only replace the first <version> occurrence
-                perl -i -pe '!\$x && s|<version>.*?</version>|<version>${params.NUXEO_VERSION}</version>| && (\$x=1)' pom.xml
-              """
+              replacePomProperty('version', params.NUXEO_VERSION)
             }
             def studioVersion = "${params.STUDIO_PROJECT_VERSION}".trim()
             if (!studioVersion.isEmpty()) {
@@ -196,10 +197,7 @@ pipeline {
               ----------------------------------------
               Replace Studio Project Version: ${studioReleaseVersion}
               ----------------------------------------"""
-              sh """
-                # replace studio project version
-                perl -i -pe '!\$x && s|<studio.project.version>0.0.0-SNAPSHOT</studio.project.version>|<studio.project.version>${studioReleaseVersion}</studio.project.version>| && (\$x=1)' pom.xml
-              """
+              replacePomProperty('studio.project.version', studioReleaseVersion)
             }
 
             sh """
@@ -316,17 +314,11 @@ pipeline {
             }
             def nextNuxeoVersion = "${params.NEXT_NUXEO_VERSION}"
             if (!nextNuxeoVersion.isEmpty()) {
-              sh """
-                # only replace the first <version> occurrence
-                perl -i -pe '!\$x && s|<version>.*?</version>|<version>${nextNuxeoVersion}</version>| && (\$x=1)' pom.xml
-              """
+              replacePomProperty('version', nextNuxeoVersion)
             }
             def nextStudioVersion = "${params.NEXT_STUDIO_PROJECT_VERSION}"
             if (!nextStudioVersion.isEmpty()) {
-              sh """
-                # put back studio snapshot version
-                perl -i -pe '!\$x && s|<studio.project.version>.*?</studio.project.version>|<studio.project.version>${nextStudioVersion}</studio.project.version>| && (\$x=1)' pom.xml
-              """
+              replacePomProperty('studio.project.version', nextStudioVersion)
             }
 
             def message = "Post release ${RELEASE_VERSION}, update ${CURRENT_VERSION} to ${nextVersion}"
