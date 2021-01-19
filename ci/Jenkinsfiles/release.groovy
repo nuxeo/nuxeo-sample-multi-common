@@ -284,7 +284,7 @@ pipeline {
             sh """
               PACKAGES_TO_UPLOAD="**/target/nuxeo-*-package*.zip"
               for file in \$PACKAGES_TO_UPLOAD ; do
-                curl --fail -i -u "$CONNECT_PASS" -F package=@\$(ls \$file) "$CONNECT_PROD_URL"/site/marketplace/upload?batch=true&orgId=nuxeo&restrictedToOrgs=nuxeo;
+                curl --fail -i -u "$CONNECT_PASS" -F package=@\$(ls \$file) "$CONNECT_PROD_URL""/site/marketplace/upload?batch=true&orgId=nuxeo&restrictedToOrgs=nuxeo" ;
               done
             """
           }
