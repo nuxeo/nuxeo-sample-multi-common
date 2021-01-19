@@ -1,8 +1,8 @@
 <!-- See documentation at http://doc.nuxeo.com/x/HgIz -->
 <package type="addon" name="nuxeo-sample-common-package" version="@VERSION@">
-  <title>Custom Common Package</title>
+  <title>Sample Common Package</title>
   <description>
-    <p>Custom Common Package for SUPINT-1828 Tests</p>
+    <p>Sample Common Package for SUPINT-1828 Tests</p>
   </description>
   <vendor>Nuxeo</vendor>
   <installer restart="true" />
