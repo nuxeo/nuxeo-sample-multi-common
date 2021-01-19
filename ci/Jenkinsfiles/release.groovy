@@ -207,7 +207,7 @@ pipeline {
       }
       post {
         always {
-          archiveArtifacts allowEmptyArchive: true, artifacts: '**/*.jar, packages/**/target/nuxeo-*-package-*.zip, **/target/**/*.log, **/target/*.png, **/target/*.html'
+          archiveArtifacts allowEmptyArchive: true, artifacts: '**/*.jar, **/target/nuxeo-*-package-*.zip, **/target/**/*.log, **/target/*.png, **/target/*.html'
           junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/*.xml, **/target/surefire-reports/*.xml'
         }
       }
