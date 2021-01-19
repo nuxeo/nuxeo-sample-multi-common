@@ -10,6 +10,10 @@
   <nuxeo-validation>none</nuxeo-validation>
   <production-state>testing</production-state>
   <supported>false</supported>
+  <!-- needed for private package selection on Studio side -->
+  <platforms>
+    <platform>@NUXEO_TARGET_PLATFORM@</platform>
+  </platforms>
   <target-platform>
     <name>server</name>
     <version>@NUXEO_TARGET_VERSION@</version>
