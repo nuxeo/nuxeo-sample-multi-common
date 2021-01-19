@@ -81,7 +81,6 @@ pipeline {
     RELEASE_VERSION = getReleaseVersion(params.RELEASE_VERSION, CURRENT_VERSION)
     MAVEN_ARGS = '-B -nsu -Prelease'
     MAVEN_RELEASE_OPTIONS = getMavenReleaseOptions(params.SKIP_TESTS)
-    MAVEN_SKIP_ENFORCER = ' -Dnuxeo.skip.enforcer=true'
     CONNECT_PROD_URL = 'https://connect.nuxeo.com/nuxeo'
     STUDIO_PROJECT_RELEASE_URL = 'https://connect.nuxeo.com/nuxeo/site/studio/v2/project/nuxeo-common-test-projec/releases'
     VERSION = "${RELEASE_VERSION}"
@@ -205,7 +204,7 @@ pipeline {
 
             sh """
               # project version
-              mvn ${MAVEN_ARGS} ${MAVEN_SKIP_ENFORCER} versions:set -DnewVersion=${RELEASE_VERSION} -DgenerateBackupPoms=false
+              mvn ${MAVEN_ARGS} versions:set -DnewVersion=${RELEASE_VERSION} -DgenerateBackupPoms=false
             """
           }
         }
@@ -265,7 +264,7 @@ pipeline {
           ----------------------------------------
           Deploy Maven Artifacts
           ----------------------------------------"""
-          sh "mvn ${MAVEN_ARGS} ${MAVEN_SKIP_ENFORCER} -DskipTests deploy"
+          sh "mvn ${MAVEN_ARGS} -DskipTests deploy"
         }
       }
     }
@@ -336,7 +335,7 @@ pipeline {
             }
             sh """
               # project version
-              mvn ${MAVEN_ARGS} ${MAVEN_SKIP_ENFORCER} versions:set -DnewVersion=${nextVersion} -DgenerateBackupPoms=false
+              mvn ${MAVEN_ARGS} versions:set -DnewVersion=${nextVersion} -DgenerateBackupPoms=false
 
               git commit -a -m "${message}"
             """

@@ -49,7 +49,7 @@ pipeline {
   }
   environment {
     MAVEN_OPTS = "$MAVEN_OPTS -Xms2g -Xmx2g  -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
-    MAVEN_ARGS = '-B -nsu -Dnuxeo.skip.enforcer=true'
+    MAVEN_ARGS = '-B -nsu'
     REFERENCE_BRANCH = 'master'
     SCM_REF = "${getCommitSha1()}"
     VERSION = "${getVersion(REFERENCE_BRANCH)}"
