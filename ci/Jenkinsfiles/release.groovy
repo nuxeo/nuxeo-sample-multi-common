@@ -128,6 +128,7 @@ pipeline {
             echo "Aborting release with message: ${message}"
             error(currentBuild.description)
           }
+          currentBuild.description = "Releasing version ${RELEASE_VERSION}"
         }
       }
     }
@@ -331,6 +332,7 @@ pipeline {
 
               git commit -a -m "${message}"
             """
+            currentBuild.description = "Released version ${RELEASE_VERSION}"
 
             if (env.DRY_RUN != "true") {
               sh """
