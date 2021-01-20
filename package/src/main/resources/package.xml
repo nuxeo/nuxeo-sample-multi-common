@@ -15,8 +15,8 @@
     <platform>@NUXEO_TARGET_PLATFORM@</platform>
   </platforms>
   <target-platform>
-    <name>server</name>
-    <version>@NUXEO_TARGET_VERSION@</version>
+    <name>@NUXEO_DISTRIBUTION_NAME@</name>
+    <version>@NUXEO_TARGET_RANGE@</version>
   </target-platform>
   <license />
   <license-url />
