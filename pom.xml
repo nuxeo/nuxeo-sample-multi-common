@@ -9,14 +9,14 @@
 
   <groupId>org.nuxeo.sample</groupId>
   <artifactId>nuxeo-sample-common-parent</artifactId>
-  <version>2.4</version>
+  <version>2.5-SNAPSHOT</version>
   <name>Nuxeo sample common project parent</name>
   <description />
   <packaging>pom</packaging>
 
   <properties>
     <nuxeo.target.version>2021</nuxeo.target.version>
-    <studio.project.version>1.1.1</studio.project.version>
+    <studio.project.version>0.0.0-SNAPSHOT</studio.project.version>
     <nuxeo.skip.enforcer>true</nuxeo.skip.enforcer>
   </properties>
 
