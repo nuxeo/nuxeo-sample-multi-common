@@ -34,6 +34,12 @@ void setGitHubBuildStatus(String context, String message, String state) {
   ])
 }
 
+void getNuxeoVersion() {
+  container('maven') {
+    return sh(returnStdout: true, script: 'mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=nuxeo.platform.version -q -DforceStdout').trim()
+  }
+}
+
 String getVersion(referenceBranch) {
   String version = readMavenPom().getVersion()
   return BRANCH_NAME == referenceBranch ? version : version + "-${BRANCH_NAME}-${BUILD_NUMBER}"
@@ -41,6 +47,32 @@ String getVersion(referenceBranch) {
 
 String getCommitSha1() {
   return sh(returnStdout: true, script: 'git rev-parse HEAD').trim();
+}
+
+void dockerPull(String image) {
+  sh "docker pull ${image}"
+}
+
+void dockerRun(String image, String command) {
+  sh "docker run --rm ${image} ${command}"
+}
+
+void dockerTag(String image, String tag) {
+  sh "docker tag ${image} ${tag}"
+}
+
+void dockerPush(String image) {
+  sh "docker push ${image}"
+}
+
+void dockerDeploy(String imageName) {
+  String imageTag = "${ORG}/${imageName}:${VERSION}"
+  String internalImage = "${DOCKER_REGISTRY}/${imageTag}"
+  String image = "${NUXEO_DOCKER_REGISTRY}/${imageTag}"
+  echo "Push ${image}"
+  dockerPull(internalImage)
+  dockerTag(internalImage, image)
+  dockerPush(image)
 }
 
 pipeline {
@@ -53,6 +85,15 @@ pipeline {
     REFERENCE_BRANCH = 'master'
     SCM_REF = "${getCommitSha1()}"
     VERSION = "${getVersion(REFERENCE_BRANCH)}"
+
+    NUXEO_IMAGE_VERSION = getNuxeoVersion()
+    NUXEO_DOCKER_REGISTRY = 'docker-private.packages.nuxeo.com'
+    SOURCE_URL = 'https://github.com/nuxeo/nuxeo-sample-multi-common'
+    // APP_NAME and ORG needed for PR preview
+    APP_NAME = 'nuxeo-sample-multi-common'
+    ORG = 'nuxeo'
+    PREVIEW_NAMESPACE = "${APP_NAME}-${BRANCH_NAME.toLowerCase()}"
+    DOCKER_IMAGE_NAME = "${APP_NAME}"
   }
   stages {
     stage('Set Labels') {
@@ -116,6 +157,172 @@ pipeline {
         }
         unsuccessful {
           setGitHubBuildStatus('utests', 'Run unit tests', 'FAILURE')
+        }
+      }
+    }
+    stage('Build Docker Image') {
+      when {
+        anyOf {
+          branch 'PR-*'
+          branch "${REFERENCE_BRANCH}"
+        }
+      }
+      steps {
+        setGitHubBuildStatus('docker/build', 'Build Docker Image', 'PENDING')
+        container('maven') {
+          echo """
+          ------------------------------------------
+          Build Common Sample Docker Image
+          ------------------------------------------
+          Image tag: ${VERSION}
+          Registry: ${DOCKER_REGISTRY}
+          Nuxeo Image tag: ${NUXEO_IMAGE_VERSION}
+          """
+          script {
+            // build and push Docker images to the Jenkins X internal Docker registry
+            def dockerPath = 'docker'
+            sh "envsubst < ${dockerPath}/skaffold.yaml > ${dockerPath}/skaffold.yaml~gen"
+            withCredentials([string(credentialsId: 'instance-clid', variable: 'INSTANCE_CLID')]) {
+
+              // replace lines by "--"
+              String clid = sh(returnStdout: true, script: '''#!/bin/bash +x
+              echo -e "${INSTANCE_CLID}" | sed ':a;N;\$!ba;s/\\n/--/g'
+              ''')
+              withEnv(["CLID=${clid}"]) {
+                sh "skaffold build -f ${dockerPath}/skaffold.yaml~gen"
+              }
+            }
+
+            def image = "${DOCKER_REGISTRY}/${ORG}/${DOCKER_IMAGE_NAME}:${VERSION}"
+            sh """
+              # waiting skaffold + kaniko + container-stucture-tests issue
+              #  see https://github.com/GoogleContainerTools/skaffold/issues/3907
+              docker pull ${image}
+              container-structure-test test --image ${image} --config ${dockerPath}/test/*
+            """
+          }
+        }
+      }
+      post {
+        success {
+          setGitHubBuildStatus('docker/build', 'Build Docker Image', 'SUCCESS')
+        }
+        unsuccessful {
+          setGitHubBuildStatus('docker/build', 'Build Docker Image', 'FAILURE')
+        }
+      }
+    }
+    stage('Test Docker Image') {
+      steps {
+        setGitHubBuildStatus('docker/test', 'Test Docker Image', 'PENDING')
+        container('maven') {
+          echo """
+          ----------------------------------------
+          Test Docker image
+          ----------------------------------------
+          """
+          script {
+            image = "${DOCKER_REGISTRY}/${ORG}/${DOCKER_IMAGE_NAME}:${VERSION}"
+            echo "Test ${image}"
+            dockerPull(image)
+            echo 'Run image'
+            dockerRun(image, 'nuxeoctl start')
+          }
+        }
+      }
+      post {
+        success {
+          setGitHubBuildStatus('docker/test', 'Test Docker Image', 'SUCCESS')
+        }
+        unsuccessful {
+          setGitHubBuildStatus('docker/test', 'Test Docker Image', 'FAILURE')
+        }
+      }
+    }
+    stage('Deploy Preview') {
+      when {
+          // disable on reference branch for now
+          //branch "${REFERENCE_BRANCH}"
+          allOf {
+            branch 'PR-*'
+            expression {
+              return pullRequest.labels.contains('preview')
+            }
+          }
+      }
+      steps {
+        setGitHubBuildStatus('preview', 'Deploy Preview', 'PENDING')
+        container('maven') {
+          echo """
+          ----------------------------------------
+          Deploy preview environment
+          ----------------------------------------"""
+          dir('helm/preview') {
+
+            script {
+              // first substitute docker image names and versions
+              sh """
+                cp values.yaml values.yaml.tosubst
+                envsubst < values.yaml.tosubst > values.yaml
+              """
+
+              // second create target namespace (if doesn't exist) and copy secrets to target namespace
+              String currentNs = sh(returnStdout: true, script: 'jx -b ns | sed -r "s/^Using namespace \'([^\']+)\'.+\\$/\\1/"').trim()
+              boolean nsExists = sh(returnStatus: true, script: "kubectl get namespace ${PREVIEW_NAMESPACE}") == 0
+              if (!nsExists) {
+                sh "kubectl create namespace ${PREVIEW_NAMESPACE}"
+              }
+              try {
+                boolean isReferenceBranch = BRANCH_NAME == REFERENCE_BRANCH
+                sh "kubectl --namespace platform get secret kubernetes-docker-cfg -ojsonpath='{.data.\\.dockerconfigjson}' | base64 --decode > /tmp/config.json"
+                sh """kubectl create secret generic kubernetes-docker-cfg \
+                    --namespace=${PREVIEW_NAMESPACE} \
+                    --from-file=.dockerconfigjson=/tmp/config.json \
+                    --type=kubernetes.io/dockerconfigjson --dry-run -o yaml | kubectl apply -f -"""
+                String previewCommand = isReferenceBranch ?
+                  // To avoid jx gc cron job, reference branch previews are deployed by calling jx step helm install instead of jx preview
+                  "jx step helm install --namespace ${PREVIEW_NAMESPACE} --name ${PREVIEW_NAMESPACE} --verbose ."
+                  // When deploying a pr preview, we use jx preview which gc the merged pull requests
+                  : "jx preview --namespace ${PREVIEW_NAMESPACE} --verbose --source-url=${SOURCE_URL} --preview-health-timeout 15m"
+
+                // third build and deploy the chart
+                // we use jx preview that gc the merged pull requests
+                sh """
+                  helm init --client-only --stable-repo-url=https://charts.helm.sh/stable
+                  helm repo add local-jenkins-x http://jenkins-x-chartmuseum:8080
+                  jx step helm build --verbose
+                  mkdir target && helm template . --output-dir target
+                  ${previewCommand}
+                """
+                if (isReferenceBranch) {
+                  // When not using jx preview, we need to expose the nuxeo url by hand
+                  url = sh(returnStdout: true, script: "kubectl get svc --namespace ${PREVIEW_NAMESPACE} preview -o go-template='{{index .metadata.annotations \"fabric8.io/exposeUrl\"}}'")
+                  echo """
+                    ----------------------------------------
+                    Preview available at: ${url}
+                    ----------------------------------------"""
+                }
+              } catch (err) {
+                echo "Error while deploying preview environment: ${err}"
+                if (!nsExists) {
+                  echo "Deleting namespace ${PREVIEW_NAMESPACE}"
+                  sh "kubectl delete namespace ${PREVIEW_NAMESPACE}"
+                }
+                throw err
+              }
+            }
+          }
+        }
+      }
+      post {
+        always {
+          archiveArtifacts allowEmptyArchive: true, artifacts: '**/requirements.lock, **/charts/*.tgz, **/target*/**/*.yaml'
+        }
+        success {
+          setGitHubBuildStatus('preview', 'Deploy Preview', 'SUCCESS')
+        }
+        unsuccessful {
+          setGitHubBuildStatus('preview', 'Deploy Preview', 'FAILURE')
         }
       }
     }

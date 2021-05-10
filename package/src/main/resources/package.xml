@@ -17,4 +17,7 @@
   <license />
   <license-url />
   <visibility>DEV</visibility>
+  <dependencies>
+    <package>nuxeo-web-ui</package>
+  </dependencies>
 </package>
