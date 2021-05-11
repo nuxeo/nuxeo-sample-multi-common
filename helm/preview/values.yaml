@@ -1,42 +1,44 @@
-expose:
-  Annotations:
-    helm.sh/hook: post-install,post-upgrade
-    helm.sh/hook-delete-policy: hook-succeeded
-  config:
-    # add tls configuration
-    domain: platform.dev.nuxeo.com
-    exposer: Ingress
-    http: true
-    tlsacme: true
-    tlsSecretName: platform-cluster-tls
-    urltemplate: '{{.Service}}-{{.Namespace}}.{{.Domain}}'
-
-cleanup:
-  Args:
-    - --cleanup
-  Annotations:
-    helm.sh/hook: pre-delete
-    helm.sh/hook-delete-policy: hook-succeeded
-
 nuxeo:
   fullnameOverride: preview
-  nuxeo:
-    podLabels:
+  podAnnotations:
+    preview/scm.ref: ${SCM_REF}
+  podLabels:
+    branch: "$BRANCH_NAME"
+    team: platform
+    resource: pod
+    usage: preview
+  service:
+    labels:
       branch: "$BRANCH_NAME"
       team: platform
-      resource: pod
+      resource: service
       usage: preview
-    service:
-      annotations:
-        fabric8.io/ingress.annotations: |-
-          nginx.ingress.kubernetes.io/proxy-body-size: 0
-          nginx.ingress.kubernetes.io/server-snippet: ignore_invalid_headers off;
-      labels:
-        branch: "$BRANCH_NAME"
-        team: platform
-        resource: service
-        usage: preview
-    image:
-      repository: $DOCKER_REGISTRY/$ORG/$DOCKER_IMAGE_NAME
-      tag: $VERSION
-      pullSecrets: kubernetes-docker-cfg
+  image:
+    repository: $DOCKER_REGISTRY/$ORG/$DOCKER_IMAGE_NAME
+    tag: $VERSION
+    pullPolicy: Always
+    pullSecrets:
+    - name: kubernetes-docker-cfg
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/server-snippet: ignore_invalid_headers off;
+    hostname: preview-${PREVIEW_NAMESPACE}.platform.dev.nuxeo.com
+    tls:
+    - hosts:
+      - preview-${PREVIEW_NAMESPACE}.platform.dev.nuxeo.com
+      secretName: platform-cluster-tls
+  nodeSelector:
+    team: platform
+  tolerations:
+  - effect: NoSchedule
+    key: team
+    operator: Equal
+    value: platform
+
+# needed for instance-clid replicator and local usage
+local:
+  instance_clid:
